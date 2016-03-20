@@ -320,15 +320,12 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
     }
 
     // Make Marker Overlay
-    function makeMarker(marker) {
+    function makeMarker(latlng) {
         var defer = $q.defer();
-        makeLatLng(marker.center)
-        .then(function(latlng) {
-            defer.resolve(new google.maps.Marker({
-                position: latlng,
-                editable: true
-            }));
-        });
+        defer.resolve(new google.maps.Marker({
+            position: latlng,
+            editable: true
+        }));
         return defer.promise;
     }
 
