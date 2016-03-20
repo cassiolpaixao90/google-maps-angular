@@ -1,8 +1,8 @@
 {
-  "name": "angular-google-map",
+  "name": "google-map-angular",
   "version": "1.0.0",
   "description": "Google Map Directive and Factory for AngularJS",
-  "main": "angular-google-map.js",
+  "main": "src/google-map-angular.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

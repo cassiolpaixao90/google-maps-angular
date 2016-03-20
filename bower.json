@@ -1,0 +1,24 @@
+{
+  "name": "google-map-angular",
+  "description": "Google Map Directive and Factory for AngularJS",
+  "main": "src/google-map-angular.js",
+  "authors": [
+    "Charlie McBride"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "AngularJS",
+    "Google",
+    "Maps",
+    "JavaScript"
+  ],
+  "homepage": "https://github.com/chukkwagon/google-map-angular",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

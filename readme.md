@@ -1,4 +1,4 @@
-# angular-google-map
+# google-maps-angular
 
 **Google Map Factory and Directive for Angular 1.3+**
 
@@ -7,6 +7,14 @@ A simple, unopiniated module that exposes a map directive and factory
 with endless possibilities for extensibility and customization.
 
 ### Basic Usage:
+
+Installation and Configuration:
+
+    bower install google-maps-angular
+
+    <script src="path/to/google-maps-angular/dist/agm.min.js"></script>
+
+    angular.module('app', ['angularGoogleMap']) ...
 
 The HTML:
 
