@@ -75,6 +75,7 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
     DataFetchers, ViewBuilder) {
     // The Google Content loaded over the Wire
     // Loaded once and then modified in memory
+    var mapReady = $q.defer();
     var content = {
         map: null,
         geocoder: null,
@@ -92,8 +93,8 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
         .then(function(map) {
             // Find map_canvas and attach map
             attachMaptoDOM();
-            map.panTo(content.defaultCenter);
             google.maps.event.trigger(map, 'resize');
+            mapReady.resolve(map);
             return map;
         });
     }
@@ -117,8 +118,8 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
     }
 
     // Add Controls and Search once the Map is ready
-    function mapReady(map, center, scope) {
-        center = center || content.defaultCenter;
+    function controlsAndSearch(map, center, scope) {
+        center = center || content.center;
         return addSearchBox(map)
         .then(function() {
             // This is a workaround bc injecting CustomerContent
@@ -134,8 +135,8 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
     function centerOnUser() {
         return getUserLocation()
         .then(function(cent) {
-            content.defaultCenter = cent || content.defaultCenter;
-            content.map.panTo(content.defaultCenter);
+            content.center = cent || content.center;
+            content.map.panTo(content.center);
             return cent;
         });
     }
@@ -398,7 +399,7 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
     }
 
     // Returns all of the content associated with the current Map Instance
-    function getContent() {
+    function data() {
         return content;
     }
 
@@ -406,14 +407,18 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
         // Map Getters and Setters
         renderMap: renderMap,
         mapReady: mapReady,
+        data: data,
+        centerOnUser: centerOnUser,
+
+        controlsAndSearch: controlsAndSearch,
+        addSearchBox: addSearchBox,
         renderOverlay: renderOverlay,
         geocodeLocation: geocodeLocation,
         geocodeLatLng: geocodeLatLng,
-        centerOnUser: centerOnUser,
-        activateControl: activateControl,
-        updateFence: updateFence,
-        getContent: getContent,
+
         makeMarker: makeMarker,
+        makeRectangle: makeRectangle,
+        makeCircle: makeCircle,
         makeSearchBox: makeSearchBox
     };
 }
