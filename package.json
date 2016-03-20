@@ -1,11 +1,31 @@
 {
-  "name": "google-map-angular",
+  "name": "google-maps-angular",
   "version": "1.0.0",
   "description": "Google Map Directive and Factory for AngularJS",
-  "main": "src/google-map-angular.js",
+  "main": "src/google-maps-angular.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chukkwagon/google-maps-angular.git"
+  },
   "author": "Charlie McBride",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "angular": "^1.5.2",
+    "angular-mocks": "^1.5.2",
+    "gulp": "^3.9.1",
+    "gulp-jasmine": "^2.3.0",
+    "gulp-karma": "0.0.5",
+    "gulp-util": "^3.0.7",
+    "jasmine-core": "^2.4.1",
+    "jquery": "^2.2.2",
+    "karma": "^0.13.22",
+    "karma-jasmine": "^0.3.8",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-spec-reporter": "0.0.24",
+    "lodash": "^4.6.1",
+    "phantomjs-prebuilt": "^2.1.6"
+  }
 }

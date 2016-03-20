@@ -1,7 +1,7 @@
 {
-  "name": "google-map-angular",
+  "name": "google-maps-angular",
   "description": "Google Map Directive and Factory for AngularJS",
-  "main": "src/google-map-angular.js",
+  "main": "src/google-maps-angular.js",
   "authors": [
     "Charlie McBride"
   ],
