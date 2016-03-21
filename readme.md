@@ -23,11 +23,10 @@ The HTML:
 Yep, that's it. This directive will load the map into your DOM tree at it's first
 availability. `options` specifies map options like center, zoom, etc. Valid map options
 can be found [here](https://developers.google.com/maps/documentation/javascript/3.exp/reference#Map).
-The onReady function is an option parameter that is bound to function on your scope that you wish to
+The `onReady` function is an option parameter that is bound to function on your `scope` that you wish to
 execute as soon as the map is loaded. If you want to plot markers or overlays on the map, for example,
 it is best to add them to the map in this function (though you can always add them later).
 To manipulate the map after it is rendered, you'll want to use the `GoogleMap` factory included in this module.
-The `GoogleMap` factory exposes an API for your map instance.
 
     function myController($scope, GoogleMap) {
         GoogleMap.ready
@@ -38,7 +37,7 @@ The `GoogleMap` factory exposes an API for your map instance.
 
 ### GoogleMap Factory API
 The real engine of this application is the `GoogleMap` factory which exposes
-some handy api methods for manipulation the map, as well as access to the map
+some handy api methods for manipulating the map, as well as access to the map
 itself if you want to use the [Google Maps JavaScript API](https://developers.google.com/maps/documentation/javascript/3.22/reference).
 All functions in the API return a `promise`
 

@@ -100,7 +100,7 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
     }
 
     // Create the BaseMap Based on the Start Location of the Session
-    function getBaseMap() {
+    function getBaseMap(options) {
         // First-time map load
         if (!content.map) {
             return makeMap(mapDiv, options)
@@ -111,9 +111,7 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
         // All subsequent requests w/ current JS
         } else {
             resetMap();
-            var defer = $q.defer();
-            defer.resolve(content.map);
-            return defer.promise;
+            return $q.when(content.map);
         }
     }
 
@@ -143,16 +141,14 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
 
     // Return a new Map Instance
     function makeMap(element, options) {
-        var map = $q.defer();
-        map.resolve(new google.maps.Map(element, options));
-        return map.promise;
+        return $q.when(new google.maps.Map(element, options));
     }
 
     // Attaches the MapDiv to the new Map Container
     function attachMaptoDOM() {
         if (!document.getElementById('map')) {
             document
-            .getElementById('map_container')
+            .getElementById('gma_map_container')
             .appendChild(mapDiv);
         }
     }
@@ -203,14 +199,12 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
     }
 
     // Return a Google Place Geocoder
-    function makeGeocoder() {
-        var geocoder = $q.defer();
-        geocoder.resolve(new google.maps.Geocoder());
-        return geocoder.promise;
+    function makeGeocoder(options) {
+        return $q.when(new google.maps.Geocoder(options));
     }
 
     // Add a Place Search to the map
-    function addSearchBox(map) {
+    function addSearchBox(map, position) {
         if (!content.searchBox) {
             var input = document.createElement('input');
             input.id = 'pac-input';
@@ -219,7 +213,7 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
             return makeSearchBox(input)
             .then(function(searchBox) {
                 content.searchBox = searchBox;
-                map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+                map.controls[position || google.maps.ControlPosition.TOP_LEFT].push(input);
                 addSearchListeners(map, content.searchBox, input);
                 return content.searchBox;
             });
@@ -234,9 +228,7 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
 
     // Return a Google Place Search Box
     function makeSearchBox(inputElem) {
-        var search = $q.defer();
-        search.resolve(new google.maps.places.SearchBox(inputElem));
-        return search.promise;
+        return $q.when(new google.maps.places.SearchBox(inputElem));
     }
 
     // Try to fetch the user's location
@@ -279,7 +271,6 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
 
     // Make LatLng Bounds item
     function makeLatLngBounds(bounds) {
-        var defer = $q.defer();
         var swBounds = {
             lat: bounds.southWest.lat,
             lng: bounds.southWest.lng
@@ -288,88 +279,44 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
             lat: bounds.northEast.lat,
             lng: bounds.northEast.lng
         };
-        defer.resolve(new google.maps.LatLngBounds(swBounds, neBounds));
-        return defer.promise;
+        return $q.when(new google.maps.LatLngBounds(swBounds, neBounds));
     }
 
     // Make Circle Overlay
-    function makeCircle(radius, center) {
-        var defer = $q.defer();
-        makeLatLng(center)
+    function makeCircle(options) {
+        return makeLatLng(options.center)
         .then(function(center) {
-            defer.resolve(new google.maps.Circle({
-                center: center,
-                radius: parseFloat(radius),
-                editable: true
-            }));
+            options.center = center;
+            options.radius = parseFloat(radius);
+            return $q.when(new google.maps.Circle(options));
         });
-        return defer.promise;
     }
 
     // Make Rectangle Overlay
-    function makeRectangle(bounds) {
-        var defer = $q.defer();
-        makeLatLngBounds(bounds)
+    function makeRectangle(options) {
+        return makeLatLngBounds(options.bounds)
         .then(function(gBounds) {
-            defer.resolve(new google.maps.Rectangle({
-                bounds: gBounds,
-                editable: true
-            }));
+            options.bounds = gBounds;
+            return $q.when(new google.maps.Rectangle(options));
         });
-        return defer.promise;
     }
 
     // Make Marker Overlay
-    function makeMarker(latlng) {
-        var defer = $q.defer();
-        defer.resolve(new google.maps.Marker({
-            position: latlng,
-            editable: true
-        }));
-        return defer.promise;
-    }
-
-    // Utility to calculate radius based on map zoom
-    function calculateDefaultRadius() {
-        var zoom = content.map.getZoom();
-        return (Math.pow(2, (22 - zoom)) * 1128.5 * 0.0027);
-    }
-
-    // Utility to calculate bounds based on current map bounds (yay trigonometry!)
-    function calculateBounds() {
-        var promises = [];
-        var c = content.map.getCenter(); // map center
-        var latVariance = (c.lat() - content.map.getBounds().getSouthWest().lat()) / 4;
-        var lngVariance = (c.lng() - content.map.getBounds().getSouthWest().lng()) / 4;
-        promises.push(makeLatLng({lat:c.lat() - latVariance, lng:c.lng() - lngVariance}));
-        promises.push(makeLatLng({lat:c.lat() + latVariance, lng:c.lng() + lngVariance}));
-
-        // Return an array => [swbound, nebound]
-        return $q.all(promises);
+    function makeMarker(options) {
+        return makeLatLng(options.position)
+        .then(function(latlng) {
+            options.position = latlng;
+            return $q.when(new google.maps.Marker(options));
+        });
     }
 
     /* ------------------------------------------------------
             Map Listeners and Drawing Manager Events
     -------------------------------------------------------*/
 
-    // Map Instance Listeners
-    function addMapListeners(map) {}
-
-    // Listeners for the SearchBox
-    function addSearchListeners(map, searchBox, input) {
-        map.addListener('bounds_changed', function() {
-            searchBox.setBounds(map.getBounds());
-        });
-        searchBox.addListener('places_changed', function() {
-            var places = searchBox.getPlaces();
-            map.panTo(places[0].geometry.location);
-            input.value = "";
-        });
-    }
-
     // Hide all Overlays from the map instance
     function hideAllOverlays() {
-        _.each(content.overlays, function(overlay) {
+        angular.forEach(content.overlays, function(overlay) {
             overlay.setMap(null);
         });
     }
@@ -380,24 +327,9 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
         content.overlays.length = 0;
     }
 
-    // Rest the Map for a New Feed Item
-    function resetMap() {
-        content.map.setZoom(content.defaultZoom);
-        removeFence();
-        resetUsers();
-        resetGroups();
-        removeAllOverlays();
-    }
-
-    // Reset the captured users
-    function resetUsers() {
-        content.geoFence.users = [];
-        return $q.when(null);
-    }
-
     // Returns all of the content associated with the current Map Instance
     function data() {
-        return content;
+        return $q.when(content);
     }
 
     return {
@@ -407,15 +339,16 @@ function MapService($q, $timeout, $rootScope, $compile, Initializer,
         data: data,
         centerOnUser: centerOnUser,
 
-        controlsAndSearch: controlsAndSearch,
         addSearchBox: addSearchBox,
-        renderOverlay: renderOverlay,
+        addControl: addControl,
         geocodeLocation: geocodeLocation,
         geocodeLatLng: geocodeLatLng,
 
         makeMarker: makeMarker,
         makeRectangle: makeRectangle,
         makeCircle: makeCircle,
+        makeLatLng: makeLatLng,
+        makeLatLngBounds: makeLatLngBounds,
         makeSearchBox: makeSearchBox
     };
 }
